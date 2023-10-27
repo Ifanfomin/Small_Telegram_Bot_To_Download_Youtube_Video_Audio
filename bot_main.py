@@ -18,7 +18,12 @@ class States:
 async def start_command(message: types.Message):
     keyboard = [[types.KeyboardButton(text='/video')], [types.KeyboardButton(text='/audio')]]
     video_audio_kb = types.ReplyKeyboardMarkup(keyboard=keyboard, resize_keyboard=True, one_time_keyboard=True)
-    await message.reply("Добрый день. Я могу скачать видео или аудио с ютуба", reply_markup=video_audio_kb)
+    await message.reply("Перед отправлением ссылки выберите:\n"
+                        "Скачать видео: /video\n"
+                        "Скачать аудио из видео: /audio\n"
+                        "[GitHub проекта](https://github.com/Ifanfomin/Small-Telegram-Bot-To-Download-Youtube-Video-Aoudio)",
+                        reply_markup=video_audio_kb,
+                        parse_mode="MarkdownV2")
 
 
 @dp.message_handler(state="*", commands=["video"])
@@ -38,18 +43,31 @@ async def user_set_state(message: types.Message):
 
 @dp.message_handler(state=States.video)
 async def bot_download_video(message: types.Message):
-    video_file = await download_video(message.text)
-    with open(video_file, "rb") as file:
-        await message.reply_video(file, reply=False)
-    os.remove(video_file)
+    msg = await message.reply("Скачиваем...", reply=False)
+    try:
+        video_file = await download_video(message.text)
+        with open(video_file, "rb") as file:
+            await message.reply_video(file, reply=False)
+        os.remove(video_file)
+    except Exception:
+        await msg.edit_text("Проверьте введёную ссылку")
 
 
 @dp.message_handler(state=States.audio)
 async def bot_download_audio(message: types.Message):
-    audio_file = await download_audio(message.text)
-    with open(audio_file, "rb") as file:
-        await message.reply_audio(file, reply=False)
-    os.remove(audio_file)
+    msg = await message.reply("Скачиваем...", reply=False)
+    try:
+        audio_file = await download_audio(message.text)
+        with open(audio_file, "rb") as file:
+            await message.reply_audio(file, reply=False)
+        os.remove(audio_file)
+    except Exception:
+        await msg.edit_text("Проверьте введёную ссылку")
+
+
+@dp.message_handler()
+async def please_send_start(message: types.Message):
+    await message.reply("Для начала работы введите /start", reply=False)
 
 
 if __name__ == '__main__':
