@@ -3,9 +3,10 @@ from aiogram.dispatcher import Dispatcher
 from aiogram.utils import executor
 from aiogram.contrib.fsm_storage.memory import MemoryStorage
 from download_video_audio import download_video, download_audio
+from config import bot_token
 import os
 
-bot = Bot(token="6108981524:AAFeNFOO7ZN4uwvHh2yDi4RYZw23nl0Zoc8")
+bot = Bot(token=bot_token)
 dp = Dispatcher(bot, storage=MemoryStorage())
 
 
@@ -50,6 +51,7 @@ async def bot_download_video(message: types.Message):
             await message.reply_video(file, reply=False)
         os.remove(video_file)
     except Exception:
+        print(Exception)
         await msg.edit_text("Проверьте введёную ссылку")
 
 
@@ -58,10 +60,12 @@ async def bot_download_audio(message: types.Message):
     msg = await message.reply("Скачиваем...", reply=False)
     try:
         audio_file = await download_audio(message.text)
+        print(audio_file)
         with open(audio_file, "rb") as file:
-            await message.reply_audio(file, reply=False)
+            await message.reply_audio(file, reply=False, title=" ".join(audio_file.split("_")))
         os.remove(audio_file)
-    except Exception:
+    except ValueError:
+        print(ValueError)
         await msg.edit_text("Проверьте введёную ссылку")
 
 
