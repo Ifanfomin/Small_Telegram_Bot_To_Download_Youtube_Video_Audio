@@ -3,10 +3,9 @@ from aiogram.dispatcher import Dispatcher
 from aiogram.utils import executor
 from aiogram.contrib.fsm_storage.memory import MemoryStorage
 from download_video_audio import download_video, download_audio
-from config import bot_token
 import os
 
-bot = Bot(token=bot_token)
+bot = Bot(token="BOT_TOKEN")
 dp = Dispatcher(bot, storage=MemoryStorage())
 
 
